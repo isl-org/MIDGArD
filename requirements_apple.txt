@@ -5,7 +5,7 @@
 ### Pytorch ###
 # For Apple Silicon, use the official PyTorch macOS wheels without CUDA
 
-torch==2.6.0
+torch==2.7.1+xpu
 torchvision==0.21.0 
 torchaudio==2.6.0
 
