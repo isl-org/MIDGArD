@@ -1,0 +1,137 @@
+output_directory: "output" # Relative to the project root directory
+resume: "last" #finetune
+
+# Ablation flags
+use_categorical_asset: True
+use_categorical_body: True
+use_categorical_joint: True
+use_node_orientation: True
+use_manifold_plucker: True
+use_node_2D_preencoded_latent: True
+
+# Dataset parameters
+dataset:
+    num_workers: 8
+    grid_resolution: 64
+    thresh_clamp_sdf: 0.1
+    raw_data_directory: "dataset/PartNetMobility/raw"           # Relative to the project root directory
+    metadata_directory: "dataset/PartNetMobility/metadata"      # Relative to the project root directory
+    codebook_directory: "dataset/PartNetMobility/codebook"      # Relative to the project root directory
+    processed_data_directory: "dataset/PartNetMobility/data"    # Relative to the project root directory
+    articulated_splits: "articulated_splits.json"               # Relative to metadata_directory
+    modes: [train, val, test]
+    semantic_data: "semantic_data.json"                          # Relative to metadata_directory
+    latent_2d_data: "latent_2d_data.npz"                        # Relative to codebook_directory
+    part_splits: "part_splits.json"                             # Relative to metadata_directory
+    dataset_info_file: "info.json"                              # Relative to metadata_directory
+    max_nodes: 8
+    permute_nodes: True
+    scale_all: True
+    scale_mode: max
+    cates: ["all"]                                              
+    dimensions:
+        d_node_existence: 1
+        d_node_position: 3
+        d_node_orientation: 3
+        d_node_bounding_box: 3
+        d_node_2d_latent: 64
+        d_node_semantic_label_asset: 46
+        d_node_semantic_label_body: 107
+        d_edge_chirality: 3
+        d_edge_category: 3
+        d_edge_plucker: 6
+        d_edge_plucker_manifold: 5
+        d_edge_joint_limit: 4
+
+# Model parameters
+structure_generator:
+    denoising_diffusion: # Diffusion model config
+        schedule_type: 'linear' # 'linear', 'warm0.1', 'warm0.2', 'warm0.5', 'cosine' 
+        beta_start: 0.001
+        beta_end: 0.02
+        time_steps: 100
+
+    graph_transformer: # Graph Transformer denoiser config
+        num_gat_heads: 32 # Number of attention heads
+        type_graph_layers: 'gt' # 'gt' or 'mlp'
+        hidden_node_feature_dim: [256, 256, 256, 256, 256, 256, 256, 256]
+        hidden_edge_feature_dim: [256, 256, 256, 256, 256, 256, 256, 256]
+        out_node_feature_dim: [256, 256, 256]
+        out_edge_feature_dim: [256, 128, 64]
+        p_pe_dim: 100
+        t_pe_dim: 200
+        use_batch_normalization: True
+
+    image_autoencoder:
+        checkpoint_path: image_autoencoder/checkpoint/last.pt # Relative to output_directory
+        embed_dim: 1
+        n_embed: 1024 # For the quantizer
+        codebook_weight: 1.0
+        output_hw: 137
+        ddconfig:
+            resamp_with_conv: True
+            data_dim: 2 # 2D data
+            activation: 'lrelu'
+            double_z: False
+            z_channels: 1
+            resolution: 256
+            in_channels: 3
+            out_ch: 3
+            ch: 256
+            ch_mult: [1,1,1,1,1,1]  # num_down = len(ch_mult)-1
+            num_res_blocks: 1
+            attn_resolutions: []
+            dropout: 0.0
+
+# Training parameters
+training:
+    N_t_training: 10
+    use_separate_loss: False
+    grad_clip: 500.0
+    loss_clip: 100.0
+    total_iter: 1000000
+    total_epoch: 100000
+    batch_size: 128
+    resume_training: True
+    initialize_network_file: [] # resume > initialize from file
+    initialize_network_name: [] # resume > initialize from file
+    
+    optimizer:
+        all:
+            type: adamw 
+            lr: 0.0005
+            weight_decay: 0.0 
+            amsgrad: False 
+            maximize: False 
+            betas: [0.9, 0.999] 
+            scheduler:
+                schedule_type: 'lambda'
+                lambda:
+                    lambda_params: # Guide the creation of a lambda function. These are dummy factors in the current configuration
+                        decay_schedule: [40000, 70000, 90000]
+                        decay_factor: [0.3, 0.09, 0.027] # Decay factor that will multiply the initial lambda value
+                        lr_min: 0.00000001
+                    last_epoch: -1 
+
+# Evaluation parameters
+evaluation:
+  eval_every_iter: 10000 # if this is smaller than the total ep len, will eval after an ep
+  iou_threshold: 0.5
+  batch_size: 8
+
+# Logging parameters
+logging:
+  log_directory: structure_generator # Relative to output_directory/experiment_directory/
+  loggers: ["checkpoint", "metric", "image", "hist", "video"]
+  viz_nontrain_interval: 1000
+  viz_iter_interval: 1000
+  checkpoint_epoch: 10000
+  model_select_metric: iou
+  model_select_larger: True
+  viz_one_per_batch: False
+  viz_dpi: 100
+  viz_frame: 10 # number of frames in the video
+  ignore_loading_key: ["sdf_decoder"]
+  save_latest_interval: 10000
+
+

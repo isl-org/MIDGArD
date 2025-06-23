@@ -1,0 +1,116 @@
+#
+# Copyright(c) 2025 Intel. Licensed under the MIT License <http://opensource.org/licenses/MIT>.
+#
+
+### Pytorch ###
+# For Apple Silicon, use the official PyTorch macOS wheels without CUDA
+
+torch==2.6.0
+torchvision==0.21.0 
+torchaudio==2.6.0
+
+### Pytorch Geometric ###
+torch_geometric
+
+-f https://data.pyg.org/whl/torch-2.6.0+cpu.html
+pyg_lib
+torch_scatter
+torch_sparse
+torch_cluster
+torch_spline_conv
+
+### Pytorch Extras ###
+
+torchtyping
+vector-quantize-pytorch
+
+### Hydra ###
+
+hydra-core==1.3.2
+hydra-colorlog==1.2.0
+hydra-optuna-sweeper==1.2.0
+
+### Hugging Face ###
+
+accelerate
+diffusers
+timm
+transformers
+
+### AI utils ### 
+
+chardet
+einops
+einx
+ocnn
+x_transformers
+
+### Python utils ### 
+
+beartype
+black
+defusedxml
+dill
+easydict
+flake8
+h5py
+imageio
+lxml
+matplotlib
+notebook
+numpy
+numpy-quaternion
+opencv-python
+pandas
+plyfile
+pre-commit
+pykdtree
+# pyrender # requires numpy < 2.0
+git+https://github.com/hilookas/pyrender@master#egg=pyrender
+PyOpenGL==3.1.9
+PyOpenGL-accelerate
+pytest
+scikit-image
+scikit-learn
+scipy
+setuptools
+shapely
+transforms3d
+yacs
+
+### Compile utils ###
+
+cmake
+cython
+ninja
+
+### Log & OS ###
+
+coloredlogs
+rootutils
+rich
+sh
+termcolor
+tqdm
+tqdm_joblib
+wget
+
+### Mesh Processing ###
+
+mesh2sdf
+open3d>=0.18.0
+PyMCubes
+trimesh
+mapbox-earcut 
+manifold3d
+
+### Loggers ###
+
+tensorboard
+tensorboard-plugin-profile
+tensorboardX
+# wandb
+# neptune-client
+# mlflow
+# comet-ml
+# aim>=3.16.2  # no lower than 3.16.2, see https://github.com/aimhubio/aim/issues/2550
