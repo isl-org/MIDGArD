@@ -1,0 +1,161 @@
+output_directory: "output" # Relative to the project root directory
+resume: "last" # last or finetune_sdfusion
+
+# Dataset parameters
+dataset:
+    num_workers: 8
+    grid_resolution: 64
+    padding: 0.2
+    level: 0.02
+    thresh_clamp_sdf: 0.1
+    raw_data_directory: "dataset/PartNetMobility/raw"           # Relative to the project root directory
+    metadata_directory: "dataset/PartNetMobility/metadata"      # Relative to the project root directory
+    codebook_directory: "dataset/PartNetMobility/codebook"      # Relative to the project root directory
+    processed_data_directory: "dataset/PartNetMobility/data"    # Relative to the project root directory
+    articulated_splits: "articulated_splits.json"               # Relative to metadata_directory
+    modes: [train, val, test]
+    semantic_data: "semantic_data.json"                          # Relative to metadata_directory
+    latent_2d_data: "latent_2d_data.npz"                        # Relative to codebook_directory
+    part_splits: "part_splits.json"                             # Relative to metadata_directory
+    dataset_info_file: "info.json"                              # Relative to metadata_directory
+    max_nodes: 8
+    permute_nodes: True
+    scale_all: True
+    scale_mode: max
+    cates: ["all"]                                              
+    dimensions:
+        d_node_existence: 1
+        d_node_position: 3
+        d_node_orientation: 3
+        d_node_bounding_box: 3
+        d_node_2d_latent: 64
+        d_node_semantic_label_asset: 46
+        d_node_semantic_label_body: 107
+        d_edge_chirality: 3
+        d_edge_category: 3
+        d_edge_plucker: 6
+        d_edge_plucker_manifold: 5
+        d_edge_joint_limit: 4
+        
+# Model parameters
+shape_generator:
+    denoising_diffusion: # Diffusion model config
+        schedule_type: 'linear' # 'linear', 'warm0.1', 'warm0.2', 'warm0.5', 'cosine' 
+        beta_start: 0.0001
+        beta_end: 0.02
+        scale_factor: 0.18215
+        time_steps: 1000
+        conditioning_key: "crossattn" # !!!!
+        condition_type: ["img", "txt", "graph"]
+        subtract_bb: True
+        cond_bb: True
+        bb_prior_factor: 0.02
+
+    unet_3d: # UNet denoiser config
+        image_size: 16
+        in_channels: 3
+        out_channels: 3
+        model_channels: 224
+        num_res_blocks: 2
+        attention_resolutions: [4, 2] # 16, 8, 4
+        # note: this isn\t actually the resolution but
+        # the downsampling factor, i.e. this corresnponds to
+        # attention on spatial resolution 8,16,32, as the
+        # spatial reolution of the latents is 64 for f4
+        channel_mult: [1, 2, 4] 
+        num_heads: 8
+        dims: 3 # 3D
+        use_spatial_transformer: True # custom transformer support
+        transformer_depth: 1 # custom transformer support
+        context_dim: 1280 # custom transformer support
+        use_checkpoint: True
+        legacy: False
+
+    graphmodel:
+        architecture: "mlp" # can be "mlp", "gat_local" or "gat_global"
+        in_dim: 3 # 3 if "mlp" or "gat_local", 4 if "gat_global"
+        out_dim: 1280
+        hidden_dims: [16, 64, 256]
+        use_batch_normalization: True
+        gat_hidden_channels: 8
+        gat_out_channels: 8
+        gat_heads: 8
+
+    bert: # Used to encode text conditions
+        n_embed: 1280
+        n_layer: 32
+
+    mlp: # Used to encode graph conditions
+        in_dim: 3
+        out_dim: 1280
+        hidden_dims: [16, 64, 256]
+        use_batch_normalization: True
+        
+    shape_autoencoder:
+        checkpoint_path: shape_autoencoder/checkpoint/last.pt # Relative to output_directory
+        embed_dim: 3 
+        n_embed: 8192 # For the quantizer
+        codebook_weight: 1.0
+        ddconfig:
+            resamp_with_conv: True
+            data_dim: 3 # 3D data
+            activation: 'gelu'
+            double_z: False
+            z_channels: 3
+            resolution: 64
+            in_channels: 1
+            out_ch: 1
+            ch: 64
+            ch_mult: [1,2,4]  # num_down = len(ch_mult)-1
+            num_res_blocks: 1
+            attn_resolutions: []
+            dropout: 0.0
+
+# Training parameters
+training:
+    use_separate_loss: False
+    grad_clip: 500.0
+    loss_clip: 100.0
+    total_iter: 1000000
+    total_epoch: 100000
+    batch_size: 8
+    resume_training: True
+    initialize_network_file: [] # resume > initialize from file
+    initialize_network_name: [] # resume > initialize from file
+    
+    optimizer:
+        all:
+            type: adamw
+            lr: 0.0001
+            weight_decay: 0.0 
+            amsgrad: True
+            maximize: False 
+            betas: [0.5, 0.9] 
+            scheduler:
+                schedule_type: 'step' 
+                step:
+                    step_size: 10000 # Match SDFusion parameters
+                    gamma: 0.9 # Match SDFusion parameters
+                    last_epoch: -1 
+
+# Evaluation parameters  
+evaluation:
+  eval_every_iter: 10000 # if this is smaller than the total ep len, will eval after an ep
+  iou_threshold: 0.5
+  batch_size: 1
+
+# Logging parameters
+logging:
+  log_directory: shape_generator # Relative to output_directory
+  loggers: ["checkpoint", "mesh", "metric"]
+  viz_nontrain_interval: 500
+  viz_iter_interval: 500
+  checkpoint_epoch: 1
+  model_select_metric: iou
+  model_select_larger: True
+  viz_one_per_batch: True
+  viz_frame: 10 # number of frames in the video
+  ignore_loading_key: [] #["sdf_decoder"]
+  save_latest_interval: 1
+
+
