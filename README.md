@@ -9,7 +9,7 @@
 # MIDGArD: Modular Interpretable Diffusion over Graphs for Articulated Designs
 
 [![python](https://img.shields.io/badge/-Python_3.12.8-blue?logo=python&logoColor=white)](https://www.python.org/downloads/release/python-3128/)
-<a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch%202.7.1-ee4c2c?logo=pytorch&logoColor=white"></a>
+<a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch%202.8.0-ee4c2c?logo=pytorch&logoColor=white"></a>
 [![black](https://img.shields.io/badge/Code%20Style-Black-black.svg?labelColor=gray)](https://black.readthedocs.io/en/stable/)
 [![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](https://github.com/isl-org/MIDGArD/MIDGArD/blob/main/LICENSE)
 [![Conference](http://img.shields.io/badge/NeurIPS-2024-4b44ce.svg)](https://proceedings.neurips.cc/paper_files/paper/2024/file/0318de478e18308a5f64297f618299d3-Paper-Conference.pdf)
