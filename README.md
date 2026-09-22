@@ -165,7 +165,7 @@ This process was tested on Ubuntu 20.04, Ubuntu 22.04, Ubuntu 24.04, MacOS and W
 
 Once your virtual environment manager is installed, you may proceed and setup the `MIDGArD` workspace. We provide a bash script allowing users to automatically setup `MIDGArD` and to create a suitable virtual environment for the project, connected to a specific and well tested version of python. This is the recommended way. To run this script, open a terminal in the `MIDGArD` git repository and execute the following commands:
 
-> **Note:** The setup script now installs PyTorch 2.10.0, while the codebase itself was tested with PyTorch 2.8. If you need the previously validated 2.8 environment, use a revision from before this dependency bump.
+> **Note:** The setup script now installs PyTorch 2.10.0; PyTorch 2.8 was the version used in the project's previous validation cycle.
 
 ```bash
 chmod a+x setup_midgard.sh

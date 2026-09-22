@@ -31,7 +31,10 @@ def test_platform_requirements_pin_requested_versions() -> None:
     """Ensure the hardware-specific install requirements stay in sync."""
     for filename, expected_lines in EXPECTED_PINS.items():
         requirements_file = ROOT / filename
-        lines = [line.strip() for line in requirements_file.read_text().splitlines()]
+        lines = [
+            line.strip()
+            for line in requirements_file.read_text(encoding="utf-8").splitlines()
+        ]
 
         for prefix, expected_line in expected_lines.items():
             matching_lines = [line for line in lines if line.startswith(prefix)]
