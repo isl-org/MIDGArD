@@ -164,6 +164,9 @@ This process was tested on Ubuntu 20.04, Ubuntu 22.04, Ubuntu 24.04, MacOS and W
 #### 2.2.3. Setting up the MIDGArD virtual environment
 
 Once your virtual environment manager is installed, you may proceed and setup the `MIDGArD` workspace. We provide a bash script allowing users to automatically setup `MIDGArD` and to create a suitable virtual environment for the project, connected to a specific and well tested version of python. This is the recommended way. To run this script, open a terminal in the `MIDGArD` git repository and execute the following commands:
+
+> **Note:** The codebase was tested with PyTorch 2.8.
+
 ```bash
 chmod a+x setup_midgard.sh
 ./setup_midgard.sh
